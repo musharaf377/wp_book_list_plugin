@@ -58,11 +58,11 @@
       add_submenu_page('my_books', 'Books List', 'Books List', 'manage_options', 'my_books', 'my_books_admin_page');
       add_submenu_page('my_books', 'Add New Book', 'Add New Book', 'manage_options','add_new_book', 'my_books_add_new_book_page');
       add_submenu_page('my_books', '', '', 'manage_options','edit-book', 'my_books_edit_book_page');
-      add_submenu_page('my_books', 'Add New Author', 'Add New Author', 'manage_options','edit-book', 'my_books_edit_book_page');
-      add_submenu_page('my_books', 'Manage Author', 'Manage Author', 'manage_options','edit-book', 'my_books_edit_book_page');
-      add_submenu_page('my_books', 'Add New Students', 'Add New Students', 'manage_options','edit-book', 'my_books_edit_book_page');
-      add_submenu_page('my_books', 'Manage Students', 'Manage Students', 'manage_options','edit-book', 'my_books_edit_book_page');
-      add_submenu_page('my_books', 'Course Tracker', 'Course Tracker', 'manage_options','edit-book', 'my_books_edit_book_page');
+      add_submenu_page('my_books', 'Add New Author', 'Add New Author', 'manage_options','edit-book', 'add_new_author_func');
+      add_submenu_page('my_books', 'Manage Author', 'Manage Author', 'manage_options','edit-book', 'manage_author_func');
+      add_submenu_page('my_books', 'Add New Students', 'Add New Students', 'manage_options','edit-book', 'add_new_student_func');
+      add_submenu_page('my_books', 'Manage Students', 'Manage Students', 'manage_options','edit-book', 'manage_students_func');
+      add_submenu_page('my_books', 'Course Tracker', 'Course Tracker', 'manage_options','edit-book', 'course_tracker_func');
 
  }
  add_action('admin_menu', 'my_books_admin_menu');
@@ -81,6 +81,31 @@
 
   // plugin edit book page create here
   function my_books_edit_book_page()
+  {
+      require_once PLUGIN_DIR_PATH . 'views/edit_book.php';
+  }
+  // add new author page create here
+  function add_new_author_func()
+  {
+      require_once PLUGIN_DIR_PATH . 'views/edit_book.php';
+  }
+  // author manage page create here
+  function manage_author_func()
+  {
+      require_once PLUGIN_DIR_PATH . 'views/edit_book.php';
+  }
+  // add new student page create here
+  function add_new_student_func()
+  {
+      require_once PLUGIN_DIR_PATH . 'views/edit_book.php';
+  }
+  // manage students page create here
+  function manage_students_func()
+  {
+      require_once PLUGIN_DIR_PATH . 'views/edit_book.php';
+  }
+  // course tracker page create here
+  function course_tracker_func()
   {
       require_once PLUGIN_DIR_PATH . 'views/edit_book.php';
   }
@@ -173,10 +198,10 @@
   function my_books_uninstall()
   {
     global $wpdb;
-    $wpdb->query("DROP TABLE IF EXISTS" . books_list());
-    $wpdb->query("DROP TABLE IF EXISTS" . my_author());
-    $wpdb->query("DROP TABLE IF EXISTS" . my_students());
-    $wpdb->query("DROP TABLE IF EXISTS" . my_enrol());
+    $wpdb->query("DROP TABLE IF EXISTS " . books_list());
+    $wpdb->query("DROP TABLE IF EXISTS " . my_author());
+    $wpdb->query("DROP TABLE IF EXISTS " . my_students());
+    $wpdb->query("DROP TABLE IF EXISTS " . my_enrol());
 
   }
   register_uninstall_hook(__FILE__, 'my_books_uninstall');
