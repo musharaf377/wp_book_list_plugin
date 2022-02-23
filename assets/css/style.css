@@ -1,0 +1,33 @@
+
+#all_user_page{
+  padding: 50px 0px;
+}
+.panel.panel-primary {
+  border-radius: 10px;
+}
+
+.panel-heading {
+  background: #007bff;
+  padding: 15px;
+  color: #fff;
+  font-size: 20px;
+  margin: 0px;
+  border-radius: 10px 10px 0px 0px;
+}
+
+.panel-body {
+  padding: 30px;
+  border: 1px solid #007bff;
+}
+
+div#book_list_table_length select {
+  width: 55px;
+}
+
+form#add_book_form label.error {
+  color: red;
+}
+
+span#show_img {
+  margin-left: 30px;
+}
