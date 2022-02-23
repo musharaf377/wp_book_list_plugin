@@ -55,12 +55,14 @@
  function my_books_admin_menu()
  {
       add_menu_page('My Books', 'My Books', 'manage_options', 'my_books', 'my_books_admin_page', 'dashicons-book-alt', 6);
-
       add_submenu_page('my_books', 'Books List', 'Books List', 'manage_options', 'my_books', 'my_books_admin_page');
-
       add_submenu_page('my_books', 'Add New Book', 'Add New Book', 'manage_options','add_new_book', 'my_books_add_new_book_page');
-
       add_submenu_page('my_books', '', '', 'manage_options','edit-book', 'my_books_edit_book_page');
+      add_submenu_page('my_books', 'Add New Author', 'Add New Author', 'manage_options','edit-book', 'my_books_edit_book_page');
+      add_submenu_page('my_books', 'Manage Author', 'Manage Author', 'manage_options','edit-book', 'my_books_edit_book_page');
+      add_submenu_page('my_books', 'Add New Students', 'Add New Students', 'manage_options','edit-book', 'my_books_edit_book_page');
+      add_submenu_page('my_books', 'Manage Students', 'Manage Students', 'manage_options','edit-book', 'my_books_edit_book_page');
+      add_submenu_page('my_books', 'Course Tracker', 'Course Tracker', 'manage_options','edit-book', 'my_books_edit_book_page');
 
  }
  add_action('admin_menu', 'my_books_admin_menu');
@@ -83,13 +85,35 @@
       require_once PLUGIN_DIR_PATH . 'views/edit_book.php';
   }
 
+  // my author table name function
+  function books_list(){
+    global $wpdb;
+    return $wpdb->prefix."books_list";
+
+  }
+  // my author table name function
+  function my_author(){
+    global $wpdb;
+    return $wpdb->prefix."my_author";
+     
+  }
+  // my students table name function
+  function my_students(){
+    global $wpdb;
+    return $wpdb->prefix."my_students";
+  }
+  // my enroll table name function
+  function my_enrol(){
+    global $wpdb;
+    return $wpdb->prefix."my_enrol";
+  }
  // plugin activation hook here
   function my_books_activate()
   {
     global $wpdb;
-    $table_name = $wpdb->prefix.'books_list'; 
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-    $sql = "CREATE TABLE $table_name(
+    $book_list_table = "CREATE TABLE ".books_list()."(
         id int(100) NOT NULL AUTO_INCREMENT,
         name varchar(100) DEFAULT NULL,
         author varchar(100) DEFAULT NULL,
@@ -98,9 +122,37 @@
         created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY  (id)
       ) ENGINE=InnoDB DEFAULT CHARSET=latin1;";
+    dbDelta($book_list_table);
+    
+    $my_author = "CREATE TABLE ".my_author()." (
+      `id` int(11) NOT NULL AUTO_INCREMENT,
+      `name` varchar(255) DEFAULT NULL,
+      `fb_link` varchar(255) DEFAULT NULL,
+      `about` text DEFAULT NULL,
+      `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+      PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+    dbDelta($my_author);
 
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta($sql);
+    $my_students = "CREATE TABLE ".my_students()." (
+      `id` int(11) NOT NULL AUTO_INCREMENT,
+      `name` varchar(255) NOT NULL,
+      `email` varchar(255) NOT NULL,
+      `user_login_id` int(11) NOT NULL,
+      `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+      PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+    dbDelta($my_students);
+
+    $my_enrol = "CREATE TABLE ".my_enrol()." (
+      `id` int(11) NOT NULL AUTO_INCREMENT,
+      `student_id` int(11) NOT NULL,
+      `book_id` int(11) NOT NULL,
+      `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+      PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+
+    dbDelta( $my_enrol);
 
   }
   register_activation_hook(__FILE__, 'my_books_activate');
@@ -109,8 +161,10 @@
   function my_books_deactivate()
   {
     global $wpdb;
-    $table_name = $wpdb->prefix.'books_list'; 
-    $wpdb->query("DROP TABLE IF EXISTS $table_name");
+    $wpdb->query("DROP TABLE IF EXISTS " .books_list());
+    $wpdb->query("DROP TABLE IF EXISTS " .my_author());
+    $wpdb->query("DROP TABLE IF EXISTS " .my_students());
+    $wpdb->query("DROP TABLE IF EXISTS " .my_enrol());
 
   }
   register_deactivation_hook(__FILE__, 'my_books_deactivate');
@@ -119,8 +173,10 @@
   function my_books_uninstall()
   {
     global $wpdb;
-    $table_name = $wpdb->prefix.'books_list'; 
-    $wpdb->query("DROP TABLE IF EXISTS $table_name");
+    $wpdb->query("DROP TABLE IF EXISTS" . books_list());
+    $wpdb->query("DROP TABLE IF EXISTS" . my_author());
+    $wpdb->query("DROP TABLE IF EXISTS" . my_students());
+    $wpdb->query("DROP TABLE IF EXISTS" . my_enrol());
 
   }
   register_uninstall_hook(__FILE__, 'my_books_uninstall');
@@ -135,12 +191,9 @@
       $about = $_REQUEST['about_book'] ? $_REQUEST['about_book'] : '';
       $book_image = $_REQUEST['image_name'] ? $_REQUEST['image_name'] : '';
 
-
       global $wpdb;
-      $table_name = $wpdb->prefix.'books_list';
-
       $wpdb->insert(
-        $table_name,
+        books_list(),
         array(
           'name' => $name,
           'author' => $author,
@@ -152,11 +205,9 @@
       echo json_encode(array("status"=>1,"message"=>"Book created successfully"));
     }elseif($_REQUEST['param'] == 'edit_book') {      
 
-
       global $wpdb;
-      $table_name = $wpdb->prefix.'books_list';
       $wpdb->update(
-        $table_name,
+        books_list(),
         array(
           'name'       => $_REQUEST['name'],
           'author'     => $_REQUEST['author'],
@@ -168,15 +219,14 @@
         )
       );
      
-      echo json_encode(array("status" => 1, "message" => "Book Update Successfully."));
-         
+      echo json_encode(array("status" => 1, "message" => "Book Update Successfully."));    
+    
     }elseif($_REQUEST['param'] == 'delete_book') {
 
       // print_r($_REQUEST);
       global $wpdb;
-      $table_name = $wpdb->prefix.'books_list';
       $wpdb->delete(
-        $table_name,
+        books_list(),
         array(
           'id' => $_REQUEST['id'],
         )
