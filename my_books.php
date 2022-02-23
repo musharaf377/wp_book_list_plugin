@@ -18,6 +18,7 @@
      exit;
  }
 
+//  hello bangladesh
  if(!defined('PLUGIN_DIR_PATH')){
      define('PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
  }
