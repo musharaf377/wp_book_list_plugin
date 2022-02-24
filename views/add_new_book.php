@@ -7,7 +7,7 @@
       
       <div class="col-lg-12">
         <div class="panel panel-primary">
-          <div class="panel-heading">Add New Item</div>
+          <div class="panel-heading">Add New Book</div>
           <div class="panel-body">
             <form class="form-horizontal" action="javascript:void(0)" id="add_book_form">
 
@@ -16,9 +16,26 @@
                   <input type="text" class="form-control" name="name" id="name" placeholder="Enter name" required>
               </div>
 
+            
               <div class="form-group">  
                 <label class="control-label" for="author">author:</label>
-                  <input type="text" class="form-control" name="author" id="author" placeholder="Enter author" required>
+                  <select name="author" id="author" class="form-control mw-100">
+                   <option value="-1">--Choose Author--</option>
+                   <?php
+                   global $wpdb;
+                   $author_data = $wpdb->get_results(
+                      $wpdb->prepare(
+                           "SELECT * FROM ".my_author(),
+                         ),ARRAY_A
+                     ); 
+                     
+                    foreach($author_data as $key => $author) { ?>
+                    
+                    <option value="<?php echo $author['id'] ?>"><?php echo $author['name'] ?></option>
+                    
+                 <?php } ?> 
+
+                  </select>
               </div>
 
               <div class="form-group">

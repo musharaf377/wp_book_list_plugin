@@ -102,6 +102,54 @@ jQuery(function () {
       })
   })
 
+  /* ================================================================*/
+
+  // Add Author
+  jQuery('#add_author_form').validate({
+    submitHandler: function(){
+
+      var postdata = jQuery('#add_author_form').serialize() + "&action=book_list&param=add_author";
+      jQuery.post(ajaxurl,postdata,function(response){
+        var data = jQuery.parseJSON(response);
+        
+        if(data.status == 1){
+          jQuery.notifyBar({
+            cssClass: "success",
+            html: data.message,
+          })
+          setTimeout(function(){
+            location.reload();
+          }, 1000)
+        }
+        
+      })
+
+    }
+  })
+
+  // Add Author
+  jQuery('#add_student_form').validate({
+    submitHandler: function(){
+
+      var postdata = jQuery('#add_student_form').serialize() + "&action=book_list&param=add_student";
+      jQuery.post(ajaxurl,postdata,function(response){
+        var data = jQuery.parseJSON(response);
+        console.log(data);
+        if(data.status == 1){
+          jQuery.notifyBar({
+            cssClass: "success",
+            html    : data.message,
+          })
+          setTimeout(function(){
+            location.reload();
+          }, 1000)
+        }
+        
+      })
+
+    }
+  })
+
 
 
 })
