@@ -35,11 +35,12 @@
  // plugin css and js file load here
  function my_books_admin_enqueue_scripts()
  {
-     
-      $includes_page = array('my_books','add_new_book','add_author','manage_author','add_student','manage_student','course_traker','edit-book');
-      $current_page = $_GET['page'];
+    
 
-      if(in_array($current_page, $includes_page)){
+      
+      $includes_page = array('my_books','add_new_book','add_author','manage_author','add_student','manage_student','course_traker');
+
+       if(isset($_GET['page']) && in_array($_GET['page'], $includes_page)){
         wp_enqueue_style('bootstrap-min', PLUGIN_DIR_URL . 'assets/css/bootstrap.min.css', array(), '1.0.0', 'all');
         wp_enqueue_style('data-table-min', PLUGIN_DIR_URL . 'assets/css/data_table.min.css', array(), '1.0.0', 'all');
         wp_enqueue_style('jquery_notify', PLUGIN_DIR_URL . 'assets/css/jquery_notify.css', array(), '1.0.0', 'all');
