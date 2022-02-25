@@ -191,7 +191,7 @@
     ));
 
     // dynamic create page
-    wp_insert_post(
+    $book_post_id = wp_insert_post(
       array(
       "post_type"    => "page",
       'post_status'  => 'publish',
@@ -200,6 +200,8 @@
       'post_name'    => 'my_book',
       )
     );
+
+    add_option( 'my_book_page', $book_post_id );
 
 
   }
@@ -217,7 +219,13 @@
     if(get_role('wp_read_book_user_key')){
       remove_role('wp_read_book_user_key');
     }
+     // delete dynamic page..
+     if(!empty('my_book_page')){
+       wp_delete_post( "my_book_page");
+      delete_option( 'my_book_page' );
+    }
 
+    
   }
   register_deactivation_hook(__FILE__, 'my_books_deactivate');
   

@@ -1,5 +1,5 @@
 <?php
-if($_REQUEST['param']=='save_book'){
+  if($_REQUEST['param']=='save_book'){
       
     $name = $_REQUEST['name'] ? $_REQUEST['name'] : '';
     $author = $_REQUEST['author'] ? $_REQUEST['author'] : '';
@@ -82,7 +82,5 @@ if($_REQUEST['param']=='save_book'){
     echo json_encode(array("status" => 1, "message" => "Student Added Successfully."));
 
   }
-  
-
-
+ 
   wp_die();
