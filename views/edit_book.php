@@ -40,7 +40,7 @@
 
               <div class="form-group">  
                 <label class="control-label" for="author">author:</label>
-                  <input type="text" class="form-control" value="<?php echo $book_data['author'] ?>" name="author" id="author" placeholder="Enter author" required>
+                  <input type="text" class="form-control" value="<?php echo author_details($book_data['author'])['name']?>" name="author" id="author" placeholder="Enter author" required>
               </div>
 
               <div class="form-group">
