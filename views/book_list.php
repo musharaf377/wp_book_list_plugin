@@ -8,7 +8,7 @@
     ),ARRAY_A
   );
 
-
+// print_r($book_list);
 
 
 ?>
@@ -45,7 +45,7 @@
                 <tr>
                   <td><?php echo $i++; ?></td>
                   <td><?php echo $book['name']; ?></td>
-                  <td><?php echo $book['author']; ?></td>
+                  <td><?php echo author_details($book['author'])['name']?></td>
                   <td><?php echo $book['about']; ?></td>
                   <td><?php echo $book['created_at']; ?></td>
                   <td><img src="<?php echo $book['book_image']; ?>" style="width:80px; height:80px;" alt=""></td>

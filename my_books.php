@@ -34,17 +34,13 @@
 
  // plugin css and js file load here
  function my_books_admin_enqueue_scripts()
- {
-    
-
-      
-      $includes_page = array('my_books','add_new_book','add_author','manage_author','add_student','manage_student','course_traker');
+ {      
+      $includes_page = array('add_new_book','add_author','manage_author','add_student','manage_student','course_traker');
 
        if(isset($_GET['page']) && in_array($_GET['page'], $includes_page)){
-        wp_enqueue_style('bootstrap-min', PLUGIN_DIR_URL . 'assets/css/bootstrap.min.css', array(), '1.0.0', 'all');
+        
         wp_enqueue_style('data-table-min', PLUGIN_DIR_URL . 'assets/css/data_table.min.css', array(), '1.0.0', 'all');
         wp_enqueue_style('jquery_notify', PLUGIN_DIR_URL . 'assets/css/jquery_notify.css', array(), '1.0.0', 'all');
-        wp_enqueue_style('main_style', PLUGIN_DIR_URL . 'assets/css/style.css', array(), '1.0.0', 'all');
 
         wp_enqueue_script('jquery');
         wp_enqueue_script('bootstrap-min-js', PLUGIN_DIR_URL . 'assets/js/bootstrap.min.js',array('jquery'),'1.0',true);
@@ -55,9 +51,18 @@
 
         wp_localize_script('main_scripts','ajaxurl',admin_url('admin-ajax.php'));
       }
+
  }
  add_action('admin_enqueue_scripts', 'my_books_admin_enqueue_scripts');
 
+ function my_books_wp_enqueue_scripts()
+ {
+  wp_enqueue_style('bootstrap-min', PLUGIN_DIR_URL . 'assets/css/bootstrap.min.css', array(), '1.0.0', 'all');
+
+  wp_enqueue_style('my_books_style', PLUGIN_DIR_URL . 'assets/css/style.css', array(), '1.0.0', 'all');
+   
+ }
+ add_action('init', 'my_books_wp_enqueue_scripts');
  // plugin admin menu create here
  function my_books_admin_menu()
  {
@@ -185,7 +190,7 @@
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
     dbDelta( $my_enrol);
-
+  // user roll create here
     add_role('wp_read_book_user_key', 'Read Books',array(
       'read' => true,
     ));
@@ -197,7 +202,7 @@
       'post_status'  => 'publish',
       'post_title'   => "Course Page",
       'post_content' => "[book_page]",
-      'post_name'    => 'my_book',
+      'post_name'    => 'books_list',
       )
     );
 
@@ -206,6 +211,14 @@
 
   }
   register_activation_hook(__FILE__, 'my_books_activate');
+
+  // create shortcode here
+  function my_books_shortcode()
+  { 
+      require_once PLUGIN_DIR_PATH ."views/my_books_frontend_list.php";
+  }
+  add_shortcode('book_page', 'my_books_shortcode');
+
 
   // plugin deactivation hook here
   function my_books_deactivate()
@@ -216,12 +229,14 @@
     $wpdb->query("DROP TABLE IF EXISTS " .my_students());
     $wpdb->query("DROP TABLE IF EXISTS " .my_enrol());
 
+    //remove user role
     if(get_role('wp_read_book_user_key')){
       remove_role('wp_read_book_user_key');
     }
      // delete dynamic page..
-     if(!empty('my_book_page')){
-       wp_delete_post( "my_book_page");
+     if(!empty(get_option( 'my_book_page'))){
+       $page_id = get_option( 'my_book_page' );
+       wp_delete_post( $page_id, true );
       delete_option( 'my_book_page' );
     }
 
@@ -250,4 +265,55 @@
   add_action('wp_ajax_book_list', 'my_books_ajax_handler');
 
 
-  //this is update
+// frontend page design here
+function my_books_frontend_page($page_template)
+{
+  global $post;
+  $page_slug = $post->post_name;
+
+  if($page_slug == "books_list"){
+    $page_template = PLUGIN_DIR_PATH ."views/frontend_book_template.php";
+  }
+  return $page_template;
+
+}
+add_filter('page_template', 'my_books_frontend_page');
+
+//author details here 
+function author_details($author_id)
+{
+  global $wpdb;
+  $author_details = $wpdb->get_row(
+    $wpdb->prepare(
+      "SELECT * FROM ".my_author()." WHERE id = %d",
+      $author_id
+    ),ARRAY_A
+  );
+  return $author_details;
+}
+
+// user access control here
+function my_books_login_redirect( $redirect_to,$request, $user)
+{
+  // custom user role
+  global $user;
+  if(isset($user->roles) && is_array( $user->roles)){
+    
+    if(in_array('wp_read_book_user_key', $user->roles)){
+      return $redirect_to = site_url()."/books_list";
+    
+    }else{
+      return $redirect_to;
+    }
+  }
+  
+}
+add_filter('login_redirect', 'my_books_login_redirect', 10, 3);
+
+function my_books_logout_user()
+{
+  // custom user role
+  wp_redirect(site_url()."books_list");
+  exit();
+}
+add_filter('wp_logout', 'my_books_logout_user');
